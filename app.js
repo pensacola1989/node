@@ -34,14 +34,74 @@ app.get('/db',function (req,res) {
 	var Schema = mongoose.Schema;
 	db.on('error',console.error.bind(console,'connection error:'));
 	db.once('open',function callback() {
-		console.log('ok');
 	});
 
 
-	var schema = new Schema({ name: String }, { _id: false });
-	var Page = mongoose.model('Page',schema);
-	var p2 = new Page({ name: 'mongodb.org' });
-	console.log(p2);	
+	var childSchema = new Schema({ name: String });
+	var parentSchema = new Schema({
+		children: [childSchema]
+	})
+
+	childSchema.pre('save',function (next) {
+		if('invalid' == this.name) 
+			return next(new Error('#sdfsdfsdf'));
+		next();
+	});
+	var Parent = mongoose.model('Parent',parentSchema);
+	var parent = new Parent({ children: [{ name: 'invalid' }]});
+	parent.save(function (err) {
+		console.log(err.message);
+	});
+	// var Parent = mongoose.model('Parent',parentSchema);
+	// var parent = new Parent({
+	// 	children: [
+	// 		{ name: 'Matt' },
+	// 		{ name: 'Sarah' }
+	// 	]
+	// });
+	// parent.children[0].name = 'Matthew';
+	// parent.save(function(){
+	// 	console.warn("OK");
+	// })
+
+	// var personSchema = new Schema({
+	// 	name: String,
+	// 	sex: String,
+	// 	age: Number
+	// });
+
+	// var Person = mongoose.model('Person',personSchema);
+	// Person.update(
+	// 	{ name: 'www' },
+	// 	{ $set: { age: 24 }},
+	// 	function (err,p) {
+	// 		if(!err) {
+	// 			var result = p.name + '...' + p.age;
+	// 			console.log(result);
+	// 		}
+	// 	}
+	// );
+
+	// console.log(Person.findOne().exec(function (err,p) {
+	// 	if(!err)
+	// 		console.log(p);
+	// }));
+	// var p1 = new Person({
+	// 	name: 'www',
+	// 	sex: 'male',
+	// 	age: 25
+	// });
+	// p1.save(function (err,person) {
+	// 	if(!err)
+	// 		console.log('OK');
+	// 	var result = Person.findOne(function (err,person) {
+	// 		if(!err)
+	// 			console.log(person);
+	// 	});
+	// });
+
+
+
 
 	// var animalSchema = new Schema({ name: String, type: String });
 	// var personSchema = new Schema({
